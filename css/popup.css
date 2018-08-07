@@ -1,0 +1,67 @@
+body {
+  width: 400px;
+  margin: 0 20px;
+  font-size: 16px;
+}
+
+.menu-group {
+  display: flex;
+  position: relative;
+  margin: 20px 0;
+  line-height: 20px;
+}
+
+.menu-name {
+  color: #333;
+  flex: 1;
+}
+
+.interval-group input {
+  text-align: right;
+  width: 16px;
+}
+
+select {
+  background-color: white;
+  text-align: left;
+  height: 20px;
+  width: 80px;
+}
+
+select, .interval-group input {
+  padding: 0 2px;
+  border-width: 0 0 1px 0;
+  border-style: solid;
+  border-color: #ccc;
+  outline: none;
+  line-height: 20px;
+  user-select: none;
+}
+
+.interval-group input:focus {
+  border-color: #999;
+}
+
+.btn {
+  width: 80px;
+  height: 20px;
+  border: 1px solid #ccc;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.btn:active {
+  margin: 1px;
+  width: 78px;
+  height: 18px;
+  font-size: 15px;
+}
+
+.btn:hover {
+  border-color: #666;
+}
+
+.unit {
+  font-style: italic;
+}

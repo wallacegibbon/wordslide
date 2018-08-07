@@ -1,0 +1,110 @@
+.chrome-extension-wordslide {
+  width: 100%;
+  height: 30px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  opacity: 0.8;
+  background-color: white;
+  display: flex;
+  flex-direction: line;
+  z-index: 11111;
+}
+
+.wordslide-operate, .wordslide-data {
+  display: flex;
+  flex-direction: line;
+  font-family: Verdana,Arial,Helvetica,sans-serif;
+}
+
+.wordslide-operate {
+  width: 120px;
+}
+
+.wordslide-operate svg {
+  width: 30px;
+  height: 30px;
+}
+
+.wordslide-remember:active svg,
+.wordslide-continue:active svg,
+.wordslide-pause:active svg {
+  margin: 1px;
+  width: 28px;
+  height: 28px;
+}
+
+.wordslide-data {
+  line-height: 30px;
+  text-align: left;
+  flex: 1;
+}
+
+.wordslide-remember, .wordslide-continue, .wordslide-pause {
+  margin: 0 0 0 10px;
+  cursor: pointer;
+}
+
+.wordslide-meaning {
+  font-style: italic;
+  flex: 1;
+}
+
+.wordslide-basic {
+  display: flex;
+  margin: 0 20px;
+}
+
+.wordslide-kanzi {
+  margin: 0 20px 0 0;
+}
+
+.wordslide-kana, .wordslide-kanzi {
+  color: #001ba0;
+  font-weight: bold;
+}
+
+.wordslide-kana, .wordslide-kanzi, .wordslide-meaning {
+  font-size: 16px;
+}
+
+.wordslide-tone, .wordslide-type {
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.wordslide-tone {
+  line-height: 1;
+  margin: 0 5px;
+  color: #c00;
+}
+
+.wordslide-type {
+  width: 30px;
+  font-style: italic;
+  color: #600090;
+}
+
+.wordslide-lesson {
+  margin: 0 10px;
+  width: 30px;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  color: #444;
+}
+
+.wordslide-hide {
+  margin: 2px;
+}
+
+.wordslide-hide svg {
+  width: 20px;
+  height: 20px;
+}
+
+.wordslide-hide:active svg {
+  margin: 1px;
+  width: 18px;
+  height: 18px;
+}
