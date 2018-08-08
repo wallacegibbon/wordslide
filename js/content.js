@@ -82,7 +82,6 @@ class SlideBar {
       console.log('hide button is clicked')
       bgSetDisplay('hide')
       this.setDisplay('hide')
-      this.switchToPauseMode()
     })
 
     this.wordslideDom = wordslideDom
@@ -141,6 +140,7 @@ class SlideBar {
       this.wordslideDom.style.top = '0'
       break
     case 'hide':
+      this.switchToPauseMode()
       this.wordslideDom.style.display = 'none'
       break
     default:
