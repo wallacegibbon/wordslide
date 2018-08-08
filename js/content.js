@@ -16,6 +16,18 @@ const svgYes = `
     stroke-width="40" stroke="#000" fill="white" />
 </svg>`
 
+const svgPrev = `
+<svg viewBox="0 0 400 400">
+  <path d="M100 250 L200 150 L300 250 M0 0 Z"
+    stroke-width="40" stroke="#000" fill="white" />
+</svg>`
+
+const svgNext = `
+<svg viewBox="0 0 400 400">
+  <path d="M100 150 L200 250 L300 150 M0 0 Z"
+    stroke-width="40" stroke="#000" fill="white" />
+</svg>`
+
 const svgDelete = `
 <svg viewBox="0 0 40 40">
   <circle cx="20" cy="20" r="20" />
@@ -45,6 +57,14 @@ class SlideBar {
     wordslideRemember.className = 'wordslide-remember'
     wordslideRemember.innerHTML = svgYes
 
+    const wordslidePrev = document.createElement('div')
+    wordslidePrev.className = 'wordslide-prev'
+    wordslidePrev.innerHTML = svgPrev
+
+    const wordslideNext = document.createElement('div')
+    wordslideNext.className = 'wordslide-next'
+    wordslideNext.innerHTML = svgNext
+
     const wordslideHide = document.createElement('div')
     wordslideHide.className = 'wordslide-hide'
     wordslideHide.innerHTML = svgDelete
@@ -55,6 +75,8 @@ class SlideBar {
     wordslideOp.appendChild(wordslidePause)
     wordslideOp.appendChild(wordslideContinue)
     wordslideOp.appendChild(wordslideRemember)
+    wordslideOp.appendChild(wordslidePrev)
+    wordslideOp.appendChild(wordslideNext)
 
     wordslideDom.appendChild(wordslideOp)
     wordslideDom.appendChild(wordslideData)
@@ -76,6 +98,18 @@ class SlideBar {
       console.log('remember button is clicked')
       console.log(this.currentWord)
       bgAddRemembered(this.currentWord.idx)
+    })
+
+    wordslidePrev.addEventListener('click', () => {
+      console.log('prev button is clicked')
+      bgPauseSlide()
+      this.switchToPauseMode()
+    })
+
+    wordslideNext.addEventListener('click', () => {
+      console.log('next button is clicked')
+      bgPauseSlide()
+      this.switchToPauseMode()
     })
 
     wordslideHide.addEventListener('click', () => {
@@ -120,28 +154,42 @@ class SlideBar {
     this.intervalHandler = null
   }
 
-  genWordslideData() {
+  updateWordslideData(direction) {
     const dom1 = genSlideData(this.previousWord)
     const dom2 = genSlideData(this.currentWord)
-    return `<div class="wordslide-data-lines">${dom1}${dom2}`
+    if (direction == 'down') {
+      this.wordslideData.innerHTML =
+        `<div class="wordslide-data-lines-down">${dom1}${dom2}</div>`
+    } else {
+      this.wordslideData.innerHTML =
+        `<div class="wordslide-data-lines-up">${dom1}${dom2}</div>`
+    }
   }
 
   isNewWord(newWord) {
     return !this.currentWord || (this.currentWord.idx !== newWord.idx)
   }
 
-  updateWordslideData(newWord) {
+  updateWithNextWord(newWord) {
     if (this.isNewWord(newWord)) {
       this.previousWord = this.currentWord
       this.currentWord = newWord
-      this.wordslideData.innerHTML = this.genWordslideData()
+      this.updateWordslideData('up')
+    }
+  }
+
+  updateWithPrevWord(prevWord) {
+    if (this.isNewWord(prevWord)) {
+      this.currentWord = this.previousWord
+      this.previousWord = prevWord
+      this.updateWordslideData('down')
     }
   }
 
   async updateShow() {
     try {
       const newWord = await bgUpdateWord()
-      this.updateWordslideData(newWord)
+      this.updateWithNextWord(newWord)
     } catch (e) {
       console.error('updateShow error:', e)
     }
