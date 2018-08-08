@@ -91,6 +91,7 @@ class SlideBar {
     this.wordslideRemember = wordslideRemember
     this.wordslideData = wordslideData
     this.wordslideHide = wordslideHide
+    this.previousWord = null
     this.currentWord = null
     this.intervalHandler = null
   }
@@ -119,10 +120,32 @@ class SlideBar {
     this.intervalHandler = null
   }
 
+  genWordslideData() {
+    const dom1 = genSlideData(this.previousWord)
+    const dom2 = genSlideData(this.currentWord)
+    return `<div class="wordslide-data-lines">${dom1}${dom2}`
+  }
+
+  sameWord(newWord) {
+    return !this.currentWord || (this.currentWord.idx !== newWord.idx)
+  }
+
+  updateWordslideData(newWord) {
+    if (this.currentWord) {
+
+    } else {
+      this.currentWord = newWord
+    }
+  }
+
   async updateShow() {
     try {
-      this.currentWord = await bgUpdateWord()
-      this.wordslideData.innerHTML = genSlideData(this.currentWord)
+      const newWord = await bgUpdateWord()
+      if (this.sameWord(newWord)) {
+        this.previousWord = this.currentWord
+        this.currentWord = newWord
+        this.wordslideData.innerHTML = this.genWordslideData()
+      }
     } catch (e) {
       console.error('updateShow error:', e)
     }
@@ -165,18 +188,20 @@ class SlideBar {
 
 function genSlideData(w) {
   if (!w) {
-    return 'nothing'
+    return '<div class="wordslide-data-line"></div>'
   }
   decodeObj(w)
   return `
-<div class="wordslide-basic">
-  <div class="wordslide-kana">${w.kana}</div>
-  <div class="wordslide-tone">${ensureNotUndefined(w.tone)}</div>
-  <div class="wordslide-type">${w.type || '-'}</div>
-</div>
-<div class="wordslide-kanzi">${w.kanzi || '-'}</div>
-<div class="wordslide-meaning">${w.meaning}</div>
-<div class="wordslide-lesson">${w.lesson.toString().padStart(2, '0')}</div>`
+<div class="wordslide-data-line">
+  <div class="wordslide-basic">
+    <div class="wordslide-kana">${w.kana}</div>
+    <div class="wordslide-tone">${ensureNotUndefined(w.tone)}</div>
+    <div class="wordslide-type">${w.type || '-'}</div>
+  </div>
+  <div class="wordslide-kanzi">${w.kanzi || '-'}</div>
+  <div class="wordslide-meaning">${w.meaning}</div>
+  <div class="wordslide-lesson">${w.lesson.toString().padStart(2, '0')}</div>
+</div>`
 }
 
 function ensureNotUndefined(obj) {

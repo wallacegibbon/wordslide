@@ -8,16 +8,17 @@
   background-color: white;
   display: flex;
   flex-direction: line;
+  overflow: hidden;
   z-index: 11111;
 }
 
-.wordslide-operate, .wordslide-data {
-  display: flex;
-  flex-direction: line;
-  font-family: Verdana,Arial,Helvetica,sans-serif;
+.wordslide-data {
+  flex: 1;
 }
 
 .wordslide-operate {
+  display: flex;
+  flex-direction: line;
   width: 120px;
 }
 
@@ -34,10 +35,25 @@
   height: 28px;
 }
 
-.wordslide-data {
+@keyframes slide {
+  0% { top: 0 }
+  30% { top: -30px }
+  100% { top: -30px }
+}
+
+.wordslide-data-lines {
+  position: relative;
+  animation: slide 1s;
+  /* animation-timing-function: ease-out; */
+  animation-fill-mode: forwards;
+}
+
+.wordslide-data-line {
+  display: flex;
+  height: 30px;
   line-height: 30px;
   text-align: left;
-  flex: 1;
+  font-family: Verdana,Arial,Helvetica,sans-serif;
 }
 
 .wordslide-remember, .wordslide-continue, .wordslide-pause {
