@@ -126,26 +126,22 @@ class SlideBar {
     return `<div class="wordslide-data-lines">${dom1}${dom2}`
   }
 
-  sameWord(newWord) {
+  isNewWord(newWord) {
     return !this.currentWord || (this.currentWord.idx !== newWord.idx)
   }
 
   updateWordslideData(newWord) {
-    if (this.currentWord) {
-
-    } else {
+    if (this.isNewWord(newWord)) {
+      this.previousWord = this.currentWord
       this.currentWord = newWord
+      this.wordslideData.innerHTML = this.genWordslideData()
     }
   }
 
   async updateShow() {
     try {
       const newWord = await bgUpdateWord()
-      if (this.sameWord(newWord)) {
-        this.previousWord = this.currentWord
-        this.currentWord = newWord
-        this.wordslideData.innerHTML = this.genWordslideData()
-      }
+      this.updateWordslideData(newWord)
     } catch (e) {
       console.error('updateShow error:', e)
     }
