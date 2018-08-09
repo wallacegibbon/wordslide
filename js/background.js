@@ -16,8 +16,7 @@ class State {
     this.words = []
     this.lessons = []
     this.wordTypes = []
-    this.currentIndex = 0
-    this.currentWord = null
+    this.currentIndex = -1
     this.error = null
   }
 
@@ -38,7 +37,7 @@ class State {
 
   resetWordsAndIndex() {
     this.updateWords()
-    this.currentIndex = 0
+    this.currentIndex = -1
   }
 
   resetRemembered() {
@@ -78,12 +77,53 @@ class State {
     }
   }
 
-  updateCurrentWord() {
-    this.currentWord = this.words[this.currentIndex]
-    this.currentIndex++
-    if (this.currentIndex >= this.words.length) {
-      this.resetWordsAndIndex()
+  nextWordIdx() {
+    var nextIdx = this.currentIndex + 1
+    if (nextIdx == this.words.length) {
+      nextIdx = 0
     }
+    return nextIdx
+  }
+
+  prevWordIdx() {
+    var prevIdx = this.currentIndex - 1
+    if (prevIdx < 0) {
+      prevIdx = this.words.length - 1
+    }
+    return prevIdx
+  }
+
+  wrapWord(word) {
+    if (this.rememberedWords.indexOf(word.idx) != -1) {
+      return Object.assign({}, word, { remembered: true })
+    } else {
+      return word
+    }
+  }
+
+  currWord() {
+    return this.wrapWord(this.words[this.currentIndex])
+  }
+
+  prevWord() {
+    return this.wrapWord(this.words[this.prevWordIdx()])
+  }
+
+  nextWord() {
+    return this.wrapWord(this.words[this.nextWordIdx()])
+  }
+
+  getWord() {
+    return { curr: this.currWord(), prev: this.prevWord() }
+  }
+
+  backwardCurrent() {
+    this.currentIndex = this.prevWordIdx()
+  }
+
+  /** @TODO: return to content.js whether the word is remembered */
+  forwardCurrent() {
+    this.currentIndex = this.nextWordIdx()
   }
 
   setupLoop(interval) {
@@ -102,8 +142,8 @@ class State {
       log('isPlaying flag is false')
       return
     }
-    this.updateCurrentWord()
-    const fn = this.updateCurrentWord.bind(this)
+    this.forwardCurrent()
+    const fn = this.forwardCurrent.bind(this)
     this.intervalHandler = setInterval(fn, interval)
   }
 
@@ -166,8 +206,14 @@ class State {
     case 'addRemembered':
       this.addRemembered(req.idx)
       return respFn({ status: 'ok' })
+    case 'getPrevWord':
+      respFn(this.getWord())
+      return this.backwardCurrent()
+    case 'getNextWord':
+      this.forwardCurrent()
+      return respFn(this.getWord())
     case 'getWord':
-      return respFn(this.currentWord)
+      return respFn(this.getWord())
     default:
       log('**Err, action unknown', req)
     }

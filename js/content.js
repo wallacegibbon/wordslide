@@ -16,16 +16,24 @@ const svgYes = `
     stroke-width="40" stroke="#000" fill="white" />
 </svg>`
 
+const svgYesGreen = `
+<svg viewBox="0 0 400 400">
+  <circle cx="200" cy="200" r="200" fill="green" />
+  <path d="M110 180 L190 270 L340 90 M0 0 Z" stroke-width="40" stroke="white" fill="green" />
+</svg>`
+
 const svgPrev = `
 <svg viewBox="0 0 400 400">
+  <circle cx="200" cy="200" r="200" fill="#999" />
   <path d="M100 250 L200 150 L300 250 M0 0 Z"
-    stroke-width="40" stroke="#000" fill="white" />
+    stroke-width="40" stroke="#fff" fill="#999" />
 </svg>`
 
 const svgNext = `
 <svg viewBox="0 0 400 400">
+  <circle cx="200" cy="200" r="200" fill="#999" />
   <path d="M100 150 L200 250 L300 150 M0 0 Z"
-    stroke-width="40" stroke="#000" fill="white" />
+    stroke-width="40" stroke="#fff" fill="#999" />
 </svg>`
 
 const svgDelete = `
@@ -84,14 +92,12 @@ class SlideBar {
 
     wordslidePause.addEventListener('click', () => {
       console.log('pause button is clicked')
-      bgPauseSlide()
-      this.switchToPauseMode()
+      bgPauseSlide().then(() => this.switchToPauseMode())
     })
 
     wordslideContinue.addEventListener('click', () => {
       console.log('continue button is clicked')
-      this.switchToPlayingMode()
-      bgStartSlide()
+      bgStartSlide().then(() => this.switchToPlayingMode())
     })
 
     wordslideRemember.addEventListener('click', () => {
@@ -103,19 +109,20 @@ class SlideBar {
     wordslidePrev.addEventListener('click', () => {
       console.log('prev button is clicked')
       bgPauseSlide()
-      this.switchToPauseMode()
+      .then(() => this.switchToPauseMode())
+      .then(() => this.updateShowPrev())
     })
 
     wordslideNext.addEventListener('click', () => {
       console.log('next button is clicked')
       bgPauseSlide()
-      this.switchToPauseMode()
+      .then(() => this.switchToPauseMode())
+      .then(() => this.updateShowNext())
     })
 
     wordslideHide.addEventListener('click', () => {
       console.log('hide button is clicked')
-      bgSetDisplay('hide')
-      this.setDisplay('hide')
+      bgSetDisplay('hide').then(() => this.setDisplay('hide'))
     })
 
     this.wordslideDom = wordslideDom
@@ -125,7 +132,6 @@ class SlideBar {
     this.wordslideRemember = wordslideRemember
     this.wordslideData = wordslideData
     this.wordslideHide = wordslideHide
-    this.previousWord = null
     this.currentWord = null
     this.intervalHandler = null
   }
@@ -144,8 +150,8 @@ class SlideBar {
 
   startUpdate() {
     if (!this.intervalHandler) {
-      this.updateShow()
-      this.intervalHandler = setInterval(this.updateShow.bind(this), 1000)
+      this.updateShowNormal()
+      this.intervalHandler = setInterval(this.updateShowNormal.bind(this), 1000)
     }
   }
 
@@ -154,13 +160,15 @@ class SlideBar {
     this.intervalHandler = null
   }
 
-  updateWordslideData(direction) {
-    const dom1 = genSlideData(this.previousWord)
-    const dom2 = genSlideData(this.currentWord)
+  updateWordslideData(curr, prev, direction) {
+    const dom1 = genSlideData(prev)
+    const dom2 = genSlideData(curr)
     if (direction == 'down') {
+      this.currentWord = prev
       this.wordslideData.innerHTML =
         `<div class="wordslide-data-lines-down">${dom1}${dom2}</div>`
     } else {
+      this.currentWord = curr
       this.wordslideData.innerHTML =
         `<div class="wordslide-data-lines-up">${dom1}${dom2}</div>`
     }
@@ -170,28 +178,33 @@ class SlideBar {
     return !this.currentWord || (this.currentWord.idx !== newWord.idx)
   }
 
-  updateWithNextWord(newWord) {
-    if (this.isNewWord(newWord)) {
-      this.previousWord = this.currentWord
-      this.currentWord = newWord
-      this.updateWordslideData('up')
-    }
-  }
-
-  updateWithPrevWord(prevWord) {
-    if (this.isNewWord(prevWord)) {
-      this.currentWord = this.previousWord
-      this.previousWord = prevWord
-      this.updateWordslideData('down')
-    }
-  }
-
-  async updateShow() {
+  async updateShowNormal() {
     try {
-      const newWord = await bgUpdateWord()
-      this.updateWithNextWord(newWord)
+      const { curr, prev } = await bgUpdateWord()
+      if (!this.isNewWord(curr)) {
+        return
+      }
+      this.updateWordslideData(curr, prev, 'up')
     } catch (e) {
-      console.error('updateShow error:', e)
+      console.error('updateShowNormal error:', e)
+    }
+  }
+
+  async updateShowNext() {
+    try {
+      const { curr, prev } = await bgNextWord()
+      this.updateWordslideData(curr, prev, 'up')
+    } catch (e) {
+      console.error('updateShowNext error:', e)
+    }
+  }
+
+  async updateShowPrev() {
+    try {
+      const { curr, prev } = await bgPrevWord()
+      this.updateWordslideData(curr, prev, 'down')
+    } catch (e) {
+      console.error('updateShowPrev error:', e)
     }
   }
 
@@ -237,6 +250,9 @@ function genSlideData(w) {
   decodeObj(w)
   return `
 <div class="wordslide-data-line">
+  <div class="wordslide-remember-mark" ${w.remembered ? '' : 'style="display:none"'}>
+    ${svgYesGreen}
+  </div>
   <div class="wordslide-basic">
     <div class="wordslide-kana">${w.kana}</div>
     <div class="wordslide-tone">${ensureNotUndefined(w.tone)}</div>
@@ -263,6 +279,18 @@ function decodeObj(obj) {
 function bgUpdateWord() {
   return new Promise((res, rej) => {
     chrome.runtime.sendMessage({ action: 'getWord' }, res)
+  })
+}
+
+function bgPrevWord() {
+  return new Promise((res, rej) => {
+    chrome.runtime.sendMessage({ action: 'getPrevWord' }, res)
+  })
+}
+
+function bgNextWord() {
+  return new Promise((res, rej) => {
+    chrome.runtime.sendMessage({ action: 'getNextWord' }, res)
   })
 }
 

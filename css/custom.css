@@ -22,19 +22,32 @@
   width: 180px;
 }
 
-.wordslide-operate svg {
+.wordslide-remember svg,
+.wordslide-continue svg,
+.wordslide-pause svg {
   width: 30px;
   height: 30px;
 }
 
 .wordslide-remember:active svg,
 .wordslide-continue:active svg,
-.wordslide-pause:active svg,
-.wordslide-prev:active svg,
-.wordslide-next:active svg {
+.wordslide-pause:active svg {
   margin: 1px;
   width: 28px;
   height: 28px;
+}
+
+.wordslide-prev svg,
+.wordslide-next svg {
+  width: 20px;
+  height: 20px;
+}
+
+.wordslide-prev:active svg,
+.wordslide-next:active svg {
+  margin: 1px;
+  width: 18px;
+  height: 18px;
 }
 
 @keyframes slide-up {
@@ -62,6 +75,7 @@
 }
 
 .wordslide-data-line {
+  position: relative;
   display: flex;
   height: 30px;
   line-height: 30px;
@@ -76,6 +90,10 @@
 
 .wordslide-remember, .wordslide-continue, .wordslide-pause {
   margin: 0 0 0 10px;
+}
+
+.wordslide-prev, .wordslide-next {
+  padding: 5px 2px;
 }
 
 .wordslide-prev {
@@ -93,7 +111,7 @@
 
 .wordslide-basic {
   display: flex;
-  margin: 0 20px;
+  margin: 0 20px 0 5px;
 }
 
 .wordslide-kanzi {
@@ -148,4 +166,15 @@
   margin: 1px;
   width: 18px;
   height: 18px;
+}
+
+.wordslide-remember-mark {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+}
+
+.wordslide-remember-mark svg {
+  width: 10px;
+  height: 10px;
 }
