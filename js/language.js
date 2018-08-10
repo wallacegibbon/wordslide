@@ -12,6 +12,8 @@ const localeSnippetsEn = {
   restart: 'Back to first word',
   restart1: 'back',
   wordType: 'Word type',
+  wordCount: 'Words in current loop',
+  wordCount1: '',
   all: 'all',
 }
 
@@ -29,6 +31,8 @@ const localeSnippetsCn = {
   restart: '回到第一个单词',
   restart1: '复位',
   wordType: '选择单词类型',
+  wordCount: '当前循环单词数目',
+  wordCount1: '个',
   all: '全部',
 }
 
@@ -70,6 +74,10 @@ function renderPopup(lang) {
 <div class="menu-group">
   <div class="menu-name">${lang.wordType}</div>
   <select id="typeSelect"></select>
+</div>
+<div class="menu-group">
+  <div class="menu-name">${lang.wordCount}</div>
+  <div><span id="loopCount"></span>${lang.wordCount1}</div>
 </div>
 `
 }

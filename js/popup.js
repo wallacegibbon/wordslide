@@ -3,6 +3,7 @@ const updateButton = document.querySelector("#updateButton")
 const resetButton = document.querySelector("#resetButton")
 const clearButton = document.querySelector("#clearButton")
 const rememberDom = document.querySelector("#remember")
+const loopCountDom = document.querySelector("#loopCount")
 const displaySelect = document.querySelector("#displaySelect")
 const lessonSelect = document.querySelector("#lessonSelect")
 const typeSelect = document.querySelector("#typeSelect")
@@ -39,12 +40,14 @@ function lessonSelectHandler() {
   console.log('lessonSelectHandler is called, current value:', lessonSelect.value)
   bgState.setCurrentLesson(lessonSelect.value)
   bgState.resetLoop()
+  updateLoopCountInfo()
 }
 
 function typeSelectHandler() {
   console.log('typeSelectHandler is called, current value:', typeSelect.value)
   bgState.setCurrentType(typeSelect.value)
   bgState.resetLoop()
+  updateLoopCountInfo()
 }
 
 function displaySelectHandler() {
@@ -56,6 +59,10 @@ function displaySelectHandler() {
 function updateRememberInfo() {
   const s = `(${bgState.rememberedWords.length}/${bgState.originalWords.length})`
   rememberDom.innerHTML = s
+}
+
+function updateLoopCountInfo() {
+  loopCountDom.innerHTML = bgState.words.length
 }
 
 
@@ -105,3 +112,4 @@ lessonSelect.value = bgState.currentLesson
 typeSelect.value = bgState.currentType
 displaySelect.value = bgState.displayState
 updateRememberInfo()
+updateLoopCountInfo()
