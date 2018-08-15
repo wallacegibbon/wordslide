@@ -1,6 +1,12 @@
 const dataUrls = [
-  'https://gitee.com/wallacegibbon/staticfiles/raw/master/japanese/words.json',
-  'https://raw.githubusercontent.com/wallacegibbon/staticfiles/master/japanese/words.json',
+  {
+    url: 'https://gitee.com/wallacegibbon/staticfiles/raw/master/japanese/words.json',
+    name: 'gitee',
+  },
+  {
+    url: 'https://raw.githubusercontent.com/wallacegibbon/staticfiles/master/japanese/words.json',
+    name: 'github',
+  },
 ]
 
 class State {
@@ -18,6 +24,7 @@ class State {
     this.wordTypes = []
     this.currentIndex = -1
     this.error = null
+    this.dataSrc = null
   }
 
   updateWords() {
@@ -219,20 +226,42 @@ class State {
     }
   }
 
+  async fetchUrls(urls, timeout) {
+    const fn = makeFetchFn(timeout)
+    for (var { url, name } of urls) {
+      try {
+        console.log(`fetching data from ${url}...`)
+        const r = await fn(url)
+        if (r.status != 200) {
+          console.error(`failed fetching ${url}:`, r.status)
+          continue
+        }
+        this.dataSrc = name
+        return r
+      } catch (e) {
+        console.error(`failed fetching ${url}:`, e)
+      }
+    }
+    throw new Error(`Failed fetchUrls`)
+  }
+
+  initDataFromOriginalWords() {
+    this.wordTypes = uniqAndSortByLen(this.originalWords.map(x => x.type))
+    this.lessons = uniqArray(this.originalWords.map(x => x.lesson))
+  }
+
   async start() {
     try {
-      const resp = await fetchUrls(dataUrls, 3000)
+      const resp = await this.fetchUrls(dataUrls, 3000)
+      console.log(resp)
       this.originalWords = await resp.json()
     } catch (e) {
       this.error = 'Failed fetching remote words'
-      log('*Err,', e)
+      console.error('*Err,', e)
       return
     }
     log('Fetching remote words finished.')
-  
-    this.wordTypes = uniqAndSortByLen(this.originalWords.map(x => x.type))
-    this.lessons = uniqArray(this.originalWords.map(x => x.lesson))
-  
+    this.initDataFromOriginalWords()
     this.resetWordsAndIndex()
     this.setupLoop()
   }

@@ -15,16 +15,3 @@ function makeFetchFn(timeout) {
     })
   }
 }
-
-async function fetchUrls(urls, timeout) {
-  const fn = makeFetchFn(timeout)
-  for (var url of urls) {
-    try {
-      console.log(`fetching data from ${url}...`)
-      return await fn(url)
-    } catch (e) {
-      console.error(`failed fetching ${url}:`, e)
-    }
-  }
-  throw new Error('Failed on urls: ${urls}')
-}

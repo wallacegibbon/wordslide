@@ -9,10 +9,10 @@ body {
   position: relative;
   margin: 20px 0;
   line-height: 20px;
+  color: #333;
 }
 
 .menu-name {
-  color: #333;
   flex: 1;
 }
 
@@ -64,4 +64,18 @@ select, .interval-group input {
 
 .unit {
   font-style: italic;
+}
+
+.file-loader {
+  position: relative;
+  height: 20px;
+}
+
+#localFile {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  width: 80px;
+  height: 20px;
 }

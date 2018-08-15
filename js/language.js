@@ -1,4 +1,7 @@
 const localeSnippetsEn = {
+  dataSrc: 'Word data source',
+  loadFile: 'Load local data file',
+  loadFile1: 'load',
   period: 'Show next in every',
   period1: 'seconds',
   period2: 'update',
@@ -18,6 +21,9 @@ const localeSnippetsEn = {
 }
 
 const localeSnippetsCn = {
+  dataSrc: '单词数据的来源',
+  loadFile: '加载本地文件',
+  loadFile1: '加载',
   period: '单词播放时间间隔为',
   period1: '秒',
   period2: '更新',
@@ -78,6 +84,17 @@ function renderPopup(lang) {
 <div class="menu-group">
   <div class="menu-name">${lang.wordCount}</div>
   <div><span id="loopCount"></span>${lang.wordCount1}</div>
+</div>
+<div class="menu-group">
+  <div class="menu-name">${lang.dataSrc}</div>
+  <div class="data-src" id="dataSrc"></div>
+</div>
+<div class="menu-group">
+  <div class="menu-name">${lang.loadFile}</div>
+  <div class="file-loader">
+    <div class="btn">${lang.loadFile1}</div>
+    <input type="file" id="localFile" />
+  </div>
 </div>
 `
 }

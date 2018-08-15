@@ -2,11 +2,13 @@ const intervalInput = document.querySelector("#intervalInput")
 const updateButton = document.querySelector("#updateButton")
 const resetButton = document.querySelector("#resetButton")
 const clearButton = document.querySelector("#clearButton")
-const rememberDom = document.querySelector("#remember")
-const loopCountDom = document.querySelector("#loopCount")
+const remember = document.querySelector("#remember")
+const loopCount = document.querySelector("#loopCount")
 const displaySelect = document.querySelector("#displaySelect")
 const lessonSelect = document.querySelector("#lessonSelect")
 const typeSelect = document.querySelector("#typeSelect")
+const dataSrc = document.querySelector("#dataSrc")
+const localFile = document.querySelector('#localFile')
 
 const bgPage = chrome.extension.getBackgroundPage()
 const bgState = bgPage.state
@@ -56,13 +58,49 @@ function displaySelectHandler() {
   moveWordsBar(displaySelect.value)
 }
 
+function readFileContent(file) {
+  return new Promise((res, rej) => {
+    const reader = new FileReader()
+    reader.readAsText(file, 'utf-8')
+    reader.onload = function(e) {
+      res(e.target.result)
+    }
+    reader.onerror = function(e) {
+      console.error('readFileContent failed:', e)
+      rej(e.target.error)
+    }
+  })
+}
+
+async function fileHandler(e) {
+  const f = e.target.files[0]
+  if (!f) {
+    console.error('fileHandler error: file not selected')
+    return
+  }
+  const t = await readFileContent(f)
+  const words = JSON.parse(t)
+
+  bgState.originalWords = words
+  bgState.initDataFromOriginalWords()
+  bgState.resetWordsAndIndex()
+  bgState.setupLoop()
+
+  bgState.dataSrc = f.name
+  refreshPage()
+}
+
 function updateRememberInfo() {
   const s = `(${bgState.rememberedWords.length}/${bgState.originalWords.length})`
-  rememberDom.innerHTML = s
+  remember.innerHTML = s
 }
 
 function updateLoopCountInfo() {
-  loopCountDom.innerHTML = bgState.words.length
+  loopCount.innerHTML = bgState.words.length
+}
+
+function updateDataSrc() {
+  dataSrc.innerHTML = bgState.dataSrc
 }
 
 
@@ -97,19 +135,24 @@ async function moveWordsBar(position) {
   }
 }
 
+function refreshPage() {
+  intervalInput.value = bgState.currentInterval / 1000
+  lessonSelect.innerHTML = genOptions(bgState.lessons)
+  typeSelect.innerHTML = genOptions(bgState.wordTypes)
+  lessonSelect.value = bgState.currentLesson
+  typeSelect.value = bgState.currentType
+  displaySelect.value = bgState.displayState
+  updateRememberInfo()
+  updateLoopCountInfo()
+  updateDataSrc()
+}
+
 updateButton.addEventListener("click", updateButtonHandler)
 resetButton.addEventListener("click", resetButtonHandler)
 clearButton.addEventListener('click', clearButtonHandler)
 displaySelect.addEventListener('change', displaySelectHandler)
 lessonSelect.addEventListener('change', lessonSelectHandler)
 typeSelect.addEventListener('change', typeSelectHandler)
+localFile.addEventListener('change', fileHandler)
 
-// update the some value at startup
-intervalInput.value = bgState.currentInterval / 1000
-lessonSelect.innerHTML = genOptions(bgState.lessons)
-typeSelect.innerHTML = genOptions(bgState.wordTypes)
-lessonSelect.value = bgState.currentLesson
-typeSelect.value = bgState.currentType
-displaySelect.value = bgState.displayState
-updateRememberInfo()
-updateLoopCountInfo()
+refreshPage()
